@@ -10,10 +10,10 @@ RUN CGO_ENABLED=0 go build -o guestbook-api .
 
 FROM alpine:latest
 
-WORKDIR /root/
+WORKDIR /opt/app
 
 COPY --from=builder /app/guestbook-api .
-
+RUN chmod 0755 /opt/app/guestbook-api
 EXPOSE 8080
 
 CMD ["./guestbook-api"]
