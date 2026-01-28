@@ -34,7 +34,7 @@ jobs:
         run: make test
       
       - name: Run linter
-        run: make lint || true
+        run: make lint
 
   build-backend:
     needs: test-backend
@@ -60,7 +60,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}backend
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -81,6 +81,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-frontend:
+    needs: test-backend
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -103,7 +104,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}frontend
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -124,6 +125,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-redis:
+    needs: test-backend
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -146,7 +148,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}redis
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/redis
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -168,6 +170,7 @@ jobs:
   
 
   build-postgres:
+    needs: test-backend
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -190,7 +193,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}postgres
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/postgres
           tags: |
             type=ref,event=branch
             type=ref,event=pr
