@@ -93,7 +93,7 @@ jobs:
           sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" backend.yml
 
           git add backend.yml
-          git commit -m "Update backend image to ${{ steps.image-tag.outputs.tag }}"          
+          git commit -m "Update backend image to ${TAG}" || echo "Nothing to commit"
           git push origin main
 
   build-frontend:
@@ -152,7 +152,7 @@ jobs:
           sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" frontend.yml
 
           git add frontend.yml
-          git commit -m "Update frontend image to ${{ steps.image-tag.outputs.tag }}"          
+          git commit -m "Update frontend image to ${TAG}" || echo "Nothing to commit"
           git push origin main
 
   build-redis:
