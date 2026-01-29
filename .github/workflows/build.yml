@@ -12,6 +12,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  CONFIG_REPO: detelinadm/guestbook-k8s
 
 jobs:
   test-backend:
@@ -80,6 +81,21 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Update Kubernetes manifests
+        run: |
+          git config --global user.name "Github Actions"
+          git config --global user.emal "actions@github.com"
+
+          git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
+          cd guestbook-k8s
+
+          sed -i "s|image: .*backend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ steps.image-tag.outputs.tag }}|" backend.yml
+          sed -i "s|value: \".*\"|value: \"${{ steps.image-tag.outputs.tag }}\"|" backend.yml
+
+          git add backend.yml
+          git commit -m "Update backend image to ${{ steps.image-tag.outputs.tag }}"          
+          git push origin main
+
   build-frontend:
     needs: test-backend
     runs-on: ubuntu-latest
@@ -123,6 +139,21 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Update Kubernetes manifests
+        run: |
+          git config --global user.name "Github Actions"
+          git config --global user.emal "actions@github.com"
+
+          git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
+          cd guestbook-k8s
+
+          sed -i "s|image: .*frontend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ steps.image-tag.outputs.tag }}|" frontend.yml
+          sed -i "s|value: \".*\"|value: \"${{ steps.image-tag.outputs.tag }}\"|" frontend.yml
+
+          git add frontend.yml
+          git commit -m "Update backend image to ${{ steps.image-tag.outputs.tag }}"          
+          git push origin main
 
   build-redis:
     needs: test-backend
@@ -212,3 +243,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+
