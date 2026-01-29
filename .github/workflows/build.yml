@@ -82,19 +82,30 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Update Kubernetes manifests
+        shell: bash
+        env:
+          TAG: ${{ github.sha }}   
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          git config --global user.name "Github Actions"
-          git config --global user.emal "actions@github.com"
+          set -euo pipefail
+
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
           git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
           cd guestbook-k8s
 
-          sed -i "s|^\(\s*image:\s*\).*|\1${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${TAG}|" backend.yml
-          sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" backend.yml
+          # Update the image line
+          sed -i -E "s|^([[:space:]]*image:[[:space:]]*).*$|\1${REGISTRY}/${IMAGE_NAME}/backend:${TAG}|" backend.yml
+
+          # Update the env value line (value: "...")
+          sed -i -E "s|^([[:space:]]*value:[[:space:]]*\").*(\")$|\1${TAG}\2|" backend.yml
 
           git add backend.yml
           git commit -m "Update backend image to ${TAG}" || echo "Nothing to commit"
           git push origin main
+
 
   build-frontend:
     needs: test-backend
@@ -141,15 +152,25 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Update Kubernetes manifests
+        shell: bash
+        env:
+          TAG: ${{ github.sha }}   
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
-          git config --global user.name "Github Actions"
-          git config --global user.emal "actions@github.com"
+          set -euo pipefail
+
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
           git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
           cd guestbook-k8s
 
-          sed -i "s|^\(\s*image:\s*\).*|\1${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${TAG}|" frontend.yml
-          sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" frontend.yml
+          # Update the image line
+          sed -i -E "s|^([[:space:]]*image:[[:space:]]*).*$|\1${REGISTRY}/${IMAGE_NAME}/frontend:${TAG}|" frontend.yml
+
+          # Update the env value line (value: "...")
+          sed -i -E "s|^([[:space:]]*value:[[:space:]]*\").*(\")$|\1${TAG}\2|" frontend.yml
 
           git add frontend.yml
           git commit -m "Update frontend image to ${TAG}" || echo "Nothing to commit"
