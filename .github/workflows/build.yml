@@ -148,7 +148,7 @@ jobs:
           git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
           cd guestbook-k8s
 
-          sed -i "s|image: .*frontend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ steps.image-tag.outputs.tag }}|" frontend.yml
+          sed -i "s|image: .*/frontend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ steps.image-tag.outputs.tag }}|" frontend.yml
           sed -i "s|value: \".*\"|value: \"${{ steps.image-tag.outputs.tag }}\"|" frontend.yml
 
           git add frontend.yml
