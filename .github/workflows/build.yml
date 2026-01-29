@@ -89,8 +89,8 @@ jobs:
           git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
           cd guestbook-k8s
 
-          sed -i "s|image: .*backend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ steps.image-tag.outputs.tag }}|" backend.yml
-          sed -i "s|value: \".*\"|value: \"${{ steps.image-tag.outputs.tag }}\"|" backend.yml
+          sed -i "s|^\(\s*image:\s*\).*|\1${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${TAG}|" backend.yml
+          sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" backend.yml
 
           git add backend.yml
           git commit -m "Update backend image to ${{ steps.image-tag.outputs.tag }}"          
@@ -148,11 +148,11 @@ jobs:
           git clone https://${{ secrets.GIT_SECRET }}@github.com/${{ env.CONFIG_REPO }}.git guestbook-k8s
           cd guestbook-k8s
 
-          sed -i "s|image: .*/frontend:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ steps.image-tag.outputs.tag }}|" frontend.yml
-          sed -i "s|value: \".*\"|value: \"${{ steps.image-tag.outputs.tag }}\"|" frontend.yml
+          sed -i "s|^\(\s*image:\s*\).*|\1${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${TAG}|" frontend.yml
+          sed -i "s|^\(\s*value:\s*\"\).*\"|\1${TAG}\"|" frontend.yml
 
           git add frontend.yml
-          git commit -m "Update backend image to ${{ steps.image-tag.outputs.tag }}"          
+          git commit -m "Update frontend image to ${{ steps.image-tag.outputs.tag }}"          
           git push origin main
 
   build-redis:
